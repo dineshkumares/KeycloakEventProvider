@@ -11,19 +11,19 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
-            <version>2.4.0.Final</version>
+            <version>3.4.3.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi</artifactId>
-            <version>2.4.0.Final</version>
+            <version>3.4.3.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi-private</artifactId>
-            <version>2.4.0.Final</version>
+            <version>3.4.3.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -32,12 +32,33 @@
             <version>1.16.12</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>jsonb-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-jsonb</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>event-listener</finalName>
 
-        <!--plugins>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -57,7 +78,7 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins-->
+        </plugins>
     </build>
 
     <properties>
