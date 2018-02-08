@@ -44,14 +44,9 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>jsonb-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-jsonb</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
         </dependency>
     </dependencies>
 

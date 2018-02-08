@@ -47,7 +47,7 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
         kafkaProperties.put("linger.ms", 0);
         kafkaProperties.put("buffer.memory", 33554432);
         kafkaProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        kafkaProperties.put("value.serializer", "ch.khinkali.cryptowatch.sink.events.control.EventSerializer");
+        kafkaProperties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         return kafkaProperties;
     }
 
@@ -64,7 +64,7 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
 
     public void publish(UserEvent event) {
         initKafkaProducer();
-        final ProducerRecord<String, UserEvent> record = new ProducerRecord<>(topic, event);
+        final ProducerRecord<String, String> record = new ProducerRecord<>(topic, event.toString());
         try {
             producer.beginTransaction();
             producer.send(record);
