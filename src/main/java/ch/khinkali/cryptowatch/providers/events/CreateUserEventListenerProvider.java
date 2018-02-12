@@ -1,5 +1,6 @@
 package ch.khinkali.cryptowatch.providers.events;
 
+import ch.khinkali.cryptowatch.user.events.boundary.EventSerializer;
 import ch.khinkali.cryptowatch.user.events.entity.UserCreated;
 import lombok.NoArgsConstructor;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -21,7 +22,6 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
 
     private Logger logger = Logger.getLogger(CreateUserEventListenerProvider.class.getName());
     private KafkaProducer producer;
-    private String topic;
 
     @Override
     public void onEvent(final Event event) {
@@ -34,9 +34,6 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
     private void createUser(Event event) {
         String userId = event.getUserId();
         String username = event.getDetails().get("username");
-
-        logger.info("userId: " + userId);
-        logger.info("username: " + username);
         publish(new UserCreated(userId, username));
     }
 
@@ -47,7 +44,8 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
         kafkaProperties.put("linger.ms", 0);
         kafkaProperties.put("buffer.memory", 33554432);
         kafkaProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        kafkaProperties.put("value.serializer", "ch.khinkali.cryptowatch.user.events.boundary.EventSerializer");
+        kafkaProperties.put("value.serializer", EventSerializer.class.getCanonicalName());
+        kafkaProperties.put("transactional.id", UUID.randomUUID().toString());
         return kafkaProperties;
     }
 
@@ -55,22 +53,19 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
         if (producer != null) {
             return;
         }
-        Properties kafkaProperties = getKafkaProperties();
-        kafkaProperties.put("transactional.id", UUID.randomUUID().toString());
         // https://stackoverflow.com/questions/37363119/kafka-producer-org-apache-kafka-common-serialization-stringserializer-could-no
         Thread.currentThread().setContextClassLoader(null);
         try {
-            producer = new KafkaProducer<>(kafkaProperties);
+            producer = new KafkaProducer<>(getKafkaProperties());
         } catch (Exception e) {
             logger.severe(e.getMessage());
         }
-        topic = "users";
         producer.initTransactions();
     }
 
     public void publish(UserCreated event) {
         initKafkaProducer();
-        final ProducerRecord<String, UserCreated> record = new ProducerRecord<>(topic, event);
+        final ProducerRecord<String, UserCreated> record = new ProducerRecord<>(UserCreated.TOPIC, event);
         try {
             producer.beginTransaction();
             producer.send(record);
