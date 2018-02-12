@@ -42,7 +42,6 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
     private Properties getKafkaProperties() {
         Properties kafkaProperties = new Properties();
         kafkaProperties.put("bootstrap.servers", System.getenv("KAFKA_ADDRESS"));
-        kafkaProperties.put("users.topic", "users");
         kafkaProperties.put("batch.size", 16384);
         kafkaProperties.put("linger.ms", 0);
         kafkaProperties.put("buffer.memory", 33554432);
@@ -57,8 +56,14 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
         }
         Properties kafkaProperties = getKafkaProperties();
         kafkaProperties.put("transactional.id", UUID.randomUUID().toString());
-        producer = new KafkaProducer<>(kafkaProperties);
-        topic = kafkaProperties.getProperty("users.topic");
+        // https://stackoverflow.com/questions/37363119/kafka-producer-org-apache-kafka-common-serialization-stringserializer-could-no
+        Thread.currentThread().setContextClassLoader(null);
+        try {
+            producer = new KafkaProducer<>(kafkaProperties);
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+        }
+        topic = "users";
         producer.initTransactions();
     }
 
