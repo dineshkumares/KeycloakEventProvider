@@ -75,8 +75,10 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
             producer.send(record);
             producer.commitTransaction();
         } catch (ProducerFencedException e) {
+            logger.severe(e.getMessage());
             producer.close();
         } catch (KafkaException e) {
+            logger.severe(e.getMessage());
             producer.abortTransaction();
         }
     }
