@@ -1,5 +1,6 @@
 package ch.khinkali.cryptowatch.providers.events;
 
+import ch.khinkali.cryptowatch.user.events.entity.UserCreated;
 import lombok.NoArgsConstructor;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -46,7 +47,7 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
         kafkaProperties.put("linger.ms", 0);
         kafkaProperties.put("buffer.memory", 33554432);
         kafkaProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        kafkaProperties.put("value.serializer", "ch.khinkali.cryptowatch.providers.events.EventSerializer");
+        kafkaProperties.put("value.serializer", "ch.khinkali.cryptowatch.user.events.boundary.EventSerializer");
         return kafkaProperties;
     }
 

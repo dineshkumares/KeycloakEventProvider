@@ -9,6 +9,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>ch.khinkali.cryptowatch</groupId>
+            <artifactId>user.events</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
             <version>3.4.3.Final</version>
