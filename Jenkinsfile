@@ -49,7 +49,7 @@ node {
         ).trim()
         def podName = keycloakPods.split('\n')[1].substring(0, 'keycloak-6658dc9748-5lgcd'.size())
         echo "podName: ${podName}"
-        sh "${kct} exec -it ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=8888 -Djboss.https.port=9999 -Djboss.management.http.port=7777"
+        sh "${kct} exec -it ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=8889 -Djboss.https.port=9998 -Djboss.management.http.port=7779"
         sh "mkdir keycloakimport"
         sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
         sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | kc --namespace test replace configmap keycloakimport -f -"
