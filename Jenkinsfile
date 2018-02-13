@@ -13,6 +13,7 @@ node {
             ),
             pipelineTriggers([])
     ])
+    cleanWs()
 
     stage('checkout & unit tests & build') {
         git url: "https://github.com/khinkali/KeycloakEventProvider"
