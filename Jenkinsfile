@@ -32,14 +32,24 @@ node {
             sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/khinkali/KeycloakEventProvider.git --tags"
         }
 
-        sh "docker build -t khinkali/sink:${env.VERSION} ."
+        sh "docker build -t khinkali/keycloak:${env.VERSION} ."
         withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
             sh "docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}"
         }
-        sh "docker push khinkali/KeycloakEventProvider:${env.VERSION}"
+        sh "docker push khinkali/keycloak:${env.VERSION}"
     }
 
-    stage('deploy to test') {
+    stage('create backup from test') {
+        def keycloakPods = sh(
+                script: "kubectl --kubeconfig /tmp/admin.conf --namespace test get po -l app=keycloak",
+                returnStdout: true
+        ).trim()
+        def podName = keycloakPods.split('\n')[1].substring(0, 'keycloak-6658dc9748-5lgcd'.length)
+        echo "podName: ${podName}"
+        // sh "kubectl --kubeconfig /tmp/admin.conf exec -it ${podName} /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=8888 -Djboss.https.port=9999 -Djboss.management.http.port=7777"
+    }
+
+    /*stage('deploy to test') {
         sh "sed -i -e 's/        image: khinkali\\/keycloak:0.0.1/        image: khinkali\\/keycloak:${env.VERSION}/' startup.yml"
         sh "kubectl --kubeconfig /tmp/admin.conf apply -f startup.yml"
     }
@@ -52,5 +62,5 @@ node {
         sh "sed -i -e 's/  namespace: test/  namespace: default/' startup.yml"
         sh "sed -i -e 's/    nodePort: 31081/    nodePort: 30190/' startup.yml"
         sh "kubectl --kubeconfig /tmp/admin.conf apply -f startup.yml"
-    }
+    }*/
 }
