@@ -53,7 +53,7 @@ node {
         sleep 20
         sh "mkdir keycloakimport"
         sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
-        sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | kc --namespace test replace configmap keycloakimport -f -"
+        sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kct} replace configmap keycloakimport -f -"
     }
 
     /*stage('deploy to test') {
