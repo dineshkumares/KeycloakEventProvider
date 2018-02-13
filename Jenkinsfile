@@ -16,7 +16,9 @@ node {
 
     stage('checkout & unit tests & build') {
         git url: "https://github.com/khinkali/KeycloakEventProvider"
-        sh "mvn clean package"
+        withCredentials([usernamePassword(credentialsId: 'nexus', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
+            sh 'mvn -s settings.xml clean package'
+        }
         junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
     }
 
