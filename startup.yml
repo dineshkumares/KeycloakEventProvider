@@ -41,7 +41,7 @@ spec:
           name: keycloakimport
           items:
           - key: keycloak-export.json
-          path: keycloak-export.json
+            path: keycloak-export.json
 ---
 apiVersion: v1
 kind: Service
