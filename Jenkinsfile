@@ -49,12 +49,12 @@ node {
                 returnStdout: true
         ).trim()
         def podNameLine = keycloakPods.split('\n')[1]
-        def startIndex = entry.indexOf(' ')
+        def startIndex = podNameLine.indexOf(' ')
         if (startIndex == -1) {
             return
         }
         def podName = podNameLine.substring(0, startIndex)
-        echo "podName: ${podName}"echo "podName: ${podName}"
+        echo "podName: ${podName}"
         sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
         sleep 20
         sh "mkdir keycloakimport"
@@ -78,7 +78,7 @@ node {
                 returnStdout: true
         ).trim()
         def podNameLine = keycloakPods.split('\n')[1]
-        def startIndex = entry.indexOf(' ')
+        def startIndex = podNameLine.indexOf(' ')
         if (startIndex == -1) {
             return
         }
