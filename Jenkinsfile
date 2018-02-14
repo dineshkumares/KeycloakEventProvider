@@ -64,11 +64,29 @@ node {
 
     stage('deploy to prod') {
         input(message: 'manuel user tests ok?' )
+    }
+
+    stage('create backup from prod') {
+        def kc = 'kubectl --kubeconfig /tmp/admin.conf'
+        def keycloakPods = sh(
+                script: "${kc} get po -l app=keycloak",
+                returnStdout: true
+        ).trim()
+        def podName = keycloakPods.split('\n')[1].substring(0, 'keycloak-6658dc9748-5lgcd'.size())
+        echo "podName: ${podName}"
+        sh "${kc} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
+        sleep 20
+        sh "mkdir keycloakimport"
+        sh "${kc} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
+        sh "${kc} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kc} replace configmap keycloakimport -f -"
+    }
+
+    stage('deploy to prod') {
         withCredentials([usernamePassword(credentialsId: 'github-api-token', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
             gitHubRelease(env.VERSION, 'khinkali', 'sink', GITHUB_TOKEN)
         }
         sh "sed -i -e 's/  namespace: test/  namespace: default/' startup.yml"
-        sh "sed -i -e 's/    nodePort: 31081/    nodePort: 30190/' startup.yml"
+        sh "sed -i -e 's/    nodePort: 31190/    nodePort: 30190/' startup.yml"
         sh "kubectl --kubeconfig /tmp/admin.conf apply -f startup.yml"
     }
 }
