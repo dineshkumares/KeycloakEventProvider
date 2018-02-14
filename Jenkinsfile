@@ -48,8 +48,13 @@ node {
                 script: "${kct} get po -l app=keycloak",
                 returnStdout: true
         ).trim()
-        def podName = keycloakPods.split('\n')[1].substring(0, 'keycloak-6658dc9748-5lgcd'.size())
-        echo "podName: ${podName}"
+        def podNameLine = keycloakPods.split('\n')[1]
+        def startIndex = entry.indexOf(' ')
+        if (startIndex == -1) {
+            return
+        }
+        def podName = podNameLine.substring(0, startIndex)
+        echo "podName: ${podName}"echo "podName: ${podName}"
         sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
         sleep 20
         sh "mkdir keycloakimport"
@@ -72,8 +77,14 @@ node {
                 script: "${kc} get po -l app=keycloak",
                 returnStdout: true
         ).trim()
-        def podName = keycloakPods.split('\n')[1].substring(0, 'keycloak-6658dc9748-5lgcd'.size())
+        def podNameLine = keycloakPods.split('\n')[1]
+        def startIndex = entry.indexOf(' ')
+        if (startIndex == -1) {
+            return
+        }
+        def podName = podNameLine.substring(0, startIndex)
         echo "podName: ${podName}"
+
         sh "${kc} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
         sleep 20
         sh "rm -rf keycloakimport"
