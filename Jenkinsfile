@@ -57,7 +57,7 @@ node {
         sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kct} replace configmap keycloakimport -f -"
     }
 
-    /*stage('deploy to test') {
+    stage('deploy to test') {
         sh "sed -i -e 's/        image: khinkali\\/keycloak:0.0.1/        image: khinkali\\/keycloak:${env.VERSION}/' startup.yml"
         sh "kubectl --kubeconfig /tmp/admin.conf apply -f startup.yml"
     }
@@ -70,5 +70,5 @@ node {
         sh "sed -i -e 's/  namespace: test/  namespace: default/' startup.yml"
         sh "sed -i -e 's/    nodePort: 31081/    nodePort: 30190/' startup.yml"
         sh "kubectl --kubeconfig /tmp/admin.conf apply -f startup.yml"
-    }*/
+    }
 }

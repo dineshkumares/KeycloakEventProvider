@@ -32,6 +32,16 @@ spec:
               key: keycloak_password
         ports:
         - containerPort: 8080
+        volumeMounts:
+        - name: keycloakimport
+          mountPath: /opt/jboss/import
+      volumes:
+      - name: keycloakimport
+        configMap:
+          name: keycloakimport
+          items:
+          - key: keycloak-export.json
+          path: keycloak-export.json
 ---
 apiVersion: v1
 kind: Service
