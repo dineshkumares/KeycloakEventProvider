@@ -1,7 +1,7 @@
 package ch.khinkali.cryptowatch.providers.events;
 
 import ch.khinkali.cryptowatch.events.boundary.EventSerializer;
-import ch.khinkali.cryptowatch.events.entity.UserCreated;
+import ch.khinkali.cryptowatch.user.events.entity.UserCreated;
 import lombok.NoArgsConstructor;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
