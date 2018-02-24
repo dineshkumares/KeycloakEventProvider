@@ -1,7 +1,7 @@
 package ch.khinkali.cryptowatch.providers.events;
 
-import ch.khinkali.cryptowatch.user.events.boundary.EventSerializer;
-import ch.khinkali.cryptowatch.user.events.entity.UserCreated;
+import ch.khinkali.cryptowatch.events.boundary.EventSerializer;
+import ch.khinkali.cryptowatch.events.entity.UserCreated;
 import lombok.NoArgsConstructor;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -59,6 +59,7 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
             producer = new KafkaProducer<>(getKafkaProperties());
         } catch (Exception e) {
             logger.severe(e.getMessage());
+            e.printStackTrace();
         }
         producer.initTransactions();
     }
@@ -73,9 +74,11 @@ public class CreateUserEventListenerProvider implements EventListenerProvider {
         } catch (ProducerFencedException e) {
             logger.severe(e.getMessage());
             producer.close();
+            e.printStackTrace();
         } catch (KafkaException e) {
             logger.severe(e.getMessage());
             producer.abortTransaction();
+            e.printStackTrace();
         }
     }
 
