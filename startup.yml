@@ -30,6 +30,8 @@ spec:
             secretKeyRef:
               name: keycloak
               key: keycloak_password
+        - name: KAFKA_ADDRESS
+          value: "kafka:9092"
         ports:
         - containerPort: 8080
         volumeMounts:
