@@ -1,14 +1,14 @@
-@Library('semantic_releasing')_
+@Library('semantic_releasing') _
 
 podTemplate(label: 'mypod', containers: [
-    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'curl', image: 'khinkali/jenkinstemplate:0.0.3', command: 'cat', ttyEnabled: true),
-    containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8', command: 'cat', ttyEnabled: true)
-  ],
-  volumes: [
-    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-  ]) {
+        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true),
+        containerTemplate(name: 'curl', image: 'khinkali/jenkinstemplate:0.0.3', command: 'cat', ttyEnabled: true),
+        containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8', command: 'cat', ttyEnabled: true)
+],
+        volumes: [
+                hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+        ]) {
     node('mypod') {
         def mvnHome = tool 'M3'
         env.PATH = "${mvnHome}/bin/:${env.PATH}"
@@ -53,7 +53,7 @@ podTemplate(label: 'mypod', containers: [
             }
         }
 
-        stage('create backup from test') {
+        /*stage('create backup from test') {
             def kct = 'kubectl --namespace test'
             container('kubectl') {
                 def keycloakPods = sh(
@@ -73,7 +73,7 @@ podTemplate(label: 'mypod', containers: [
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
                 sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kct} replace configmap keycloakimport -f -"
             }
-        }
+        }*/
 
         stage('deploy to test') {
             sh "sed -i -e 's/        image: khinkali\\/keycloak:0.0.1/        image: khinkali\\/keycloak:${env.VERSION}/' startup.yml"
@@ -83,7 +83,7 @@ podTemplate(label: 'mypod', containers: [
         }
 
         stage('deploy to prod') {
-            input(message: 'manuel user tests ok?' )
+            input(message: 'manuel user tests ok?')
         }
 
         stage('create backup from prod') {
