@@ -111,11 +111,11 @@ podTemplate(label: 'mypod', containers: [
         }*/
 
         stage('deploy to prod') {
-            withCredentials([usernamePassword(credentialsId: 'github-api-token', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
+            /*withCredentials([usernamePassword(credentialsId: 'github-api-token', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
                 container('curl') {
                     gitHubRelease(env.VERSION, 'khinkali', 'KeycloakEventProvider', GITHUB_TOKEN)
                 }
-            }
+            }*/
             sh "sed -i -e 's/  namespace: test/  namespace: default/' startup.yml"
             sh "sed -i -e 's/    nodePort: 31190/    nodePort: 30190/' startup.yml"
             container('kubectl') {
