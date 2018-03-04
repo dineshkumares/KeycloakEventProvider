@@ -53,7 +53,7 @@ podTemplate(label: 'mypod', containers: [
             }
         }
 
-        /*stage('create backup from test') {
+        stage('create backup from test') {
             def kct = 'kubectl --namespace test'
             container('kubectl') {
                 def keycloakPods = sh(
@@ -73,7 +73,7 @@ podTemplate(label: 'mypod', containers: [
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
                 sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kct} replace configmap keycloakimport -f -"
             }
-        }*/
+        }
 
         stage('deploy to test') {
             sh "sed -i -e 's/        image: khinkali\\/keycloak:0.0.1/        image: khinkali\\/keycloak:${env.VERSION}/' startup.yml"
@@ -86,7 +86,7 @@ podTemplate(label: 'mypod', containers: [
             input(message: 'manuel user tests ok?')
         }
 
-        stage('create backup from prod') {
+        /*stage('create backup from prod') {
             container('kubectl') {
                 def kc = 'kubectl'
                 def keycloakPods = sh(
@@ -108,7 +108,7 @@ podTemplate(label: 'mypod', containers: [
                 sh "${kc} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
                 sh "${kc} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kc} replace configmap keycloakimport -f -"
             }
-        }
+        }*/
 
         stage('deploy to prod') {
             withCredentials([usernamePassword(credentialsId: 'github-api-token', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
