@@ -68,7 +68,7 @@ podTemplate(label: 'mypod', containers: [
                 def podName = podNameLine.substring(0, startIndex)
                 echo "podName: ${podName}"
                 sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
-                sleep 20
+                sleep 60
                 sh "mkdir keycloakimport"
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
                 sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kct} replace configmap keycloakimport -f -"
@@ -102,7 +102,7 @@ podTemplate(label: 'mypod', containers: [
                 echo "podName: ${podName}"
 
                 sh "${kc} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
-                sleep 20
+                sleep 60
                 sh "rm -rf keycloakimport"
                 sh "mkdir keycloakimport"
                 sh "${kc} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
