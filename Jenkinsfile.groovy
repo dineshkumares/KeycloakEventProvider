@@ -76,7 +76,7 @@ podTemplate(label: 'mypod', containers: [
         }
 
         stage('deploy to test') {
-            sh "sed -i -e 's/        image: khinkali\\/keycloak:0.0.1/        image: khinkali\\/keycloak:${env.VERSION}/' startup.yml"
+            sh "sed -i -e 's/        image: khinkali\\/keycloak:todo/        image: khinkali\\/keycloak:${env.VERSION}/' startup.yml"
             container('kubectl') {
                 sh "kubectl apply -f startup.yml"
             }

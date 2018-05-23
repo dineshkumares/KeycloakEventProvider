@@ -16,9 +16,29 @@ spec:
       labels:
         app: keycloak
     spec:
+      initContainers:
+      - name: clone-repo
+        image: alpine/git:1.0.4
+        securityContext:
+          runAsUser: 1000
+        command: ["/bin/sh", "-c", "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/khinkali/keycloak_backup_test /opt/jboss/keycloak/standalone/data"]
+        volumeMounts:
+        - name: keycloak-home
+          mountPath: /opt/jboss/keycloak/standalone/data
+        env:
+        - name: GIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: bitbucket
+              key: username
+        - name: GIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bitbucket
+              key: password
       containers:
       - name: keycloak
-        image: khinkali/keycloak:0.0.1
+        image: khinkali/keycloak:todo
         env:
         - name: KEYCLOAK_USER
           valueFrom:
@@ -35,15 +55,11 @@ spec:
         ports:
         - containerPort: 8080
         volumeMounts:
-        - name: keycloakimport
-          mountPath: /opt/jboss/import
+        - name: keycloak-home
+          mountPath: /opt/jboss/keycloak/standalone/data
       volumes:
-      - name: keycloakimport
-        configMap:
-          name: keycloakimport
-          items:
-          - key: keycloak-export.json
-            path: keycloak-export.json
+      - name: keycloak-home
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
