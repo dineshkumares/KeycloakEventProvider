@@ -53,28 +53,6 @@ podTemplate(label: 'mypod', containers: [
             }
         }
 
-        stage('create backup from test') {
-            def kct = 'kubectl --namespace test'
-            container('kubectl') {
-                def keycloakPods = sh(
-                        script: "${kct} get po -l app=keycloak",
-                        returnStdout: true
-                ).trim()
-                def podNameLine = keycloakPods.split('\n')[1]
-                def startIndex = podNameLine.indexOf(' ')
-                if (startIndex == -1) {
-                    return
-                }
-                def podName = podNameLine.substring(0, startIndex)
-                echo "podName: ${podName}"
-                sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
-                sleep 60
-                sh "mkdir keycloakimport"
-                sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
-                sh "${kct} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kct} replace configmap keycloakimport -f -"
-            }
-        }
-
         stage('deploy to test') {
             sh "sed -i -e 's/        image: khinkali\\/keycloak:todo/        image: khinkali\\/keycloak:${env.VERSION}/' startup.yml"
             container('kubectl') {
@@ -84,30 +62,6 @@ podTemplate(label: 'mypod', containers: [
 
         stage('deploy to prod') {
             input(message: 'manuel user tests ok?')
-        }
-
-        stage('create backup from prod') {
-            container('kubectl') {
-                def kc = 'kubectl'
-                def keycloakPods = sh(
-                        script: "${kc} get po -l app=keycloak",
-                        returnStdout: true
-                ).trim()
-                def podNameLine = keycloakPods.split('\n')[1]
-                def startIndex = podNameLine.indexOf(' ')
-                if (startIndex == -1) {
-                    return
-                }
-                def podName = podNameLine.substring(0, startIndex)
-                echo "podName: ${podName}"
-
-                sh "${kc} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
-                sleep 60
-                sh "rm -rf keycloakimport"
-                sh "mkdir keycloakimport"
-                sh "${kc} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloakimport/keycloak-export.json"
-                sh "${kc} create configmap keycloakimport --from-file=keycloakimport --dry-run -o yaml | ${kc} replace configmap keycloakimport -f -"
-            }
         }
 
         stage('deploy to prod') {
