@@ -10,8 +10,6 @@ podTemplate(label: 'mypod', containers: [
                 hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
         ]) {
     node('mypod') {
-        def mvnHome = tool 'M3'
-        env.PATH = "${mvnHome}/bin/:${env.PATH}"
         properties([
                 buildDiscarder(
                         logRotator(artifactDaysToKeepStr: '',
@@ -22,12 +20,13 @@ podTemplate(label: 'mypod', containers: [
                 ),
                 pipelineTriggers([])
         ])
-        cleanWs()
 
         stage('checkout & unit tests & build') {
             git url: "https://github.com/khinkali/KeycloakEventProvider"
             withCredentials([usernamePassword(credentialsId: 'nexus', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-                sh 'mvn -s settings.xml clean package'
+                container('maven') {
+                    sh 'mvn -s settings.xml clean package'
+                }
             }
             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
         }
@@ -36,7 +35,9 @@ podTemplate(label: 'mypod', containers: [
             env.VERSION = semanticReleasing()
             currentBuild.displayName = env.VERSION
 
-            sh "mvn versions:set -DnewVersion=${env.VERSION}"
+            container('maven') {
+                sh "mvn versions:set -DnewVersion=${env.VERSION}"
+            }
             sh "git config user.email \"jenkins@khinkali.ch\""
             sh "git config user.name \"Jenkins\""
             sh "git tag -a ${env.VERSION} -m \"${env.VERSION}\""
@@ -65,11 +66,11 @@ podTemplate(label: 'mypod', containers: [
         }
 
         stage('deploy to prod') {
-            /*withCredentials([usernamePassword(credentialsId: 'github-api-token', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
+            withCredentials([usernamePassword(credentialsId: 'github-api-token', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GIT_USERNAME')]) {
                 container('curl') {
                     gitHubRelease(env.VERSION, 'khinkali', 'KeycloakEventProvider', GITHUB_TOKEN)
                 }
-            }*/
+            }
             sh "sed -i -e 's/  namespace: test/  namespace: default/' startup.yml"
             sh "sed -i -e 's/    nodePort: 31190/    nodePort: 30190/' startup.yml"
             container('kubectl') {
